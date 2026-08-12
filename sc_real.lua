@@ -1,4 +1,7 @@
 -- ========================================================
+-- ROBLOX OPTIMIZATION SCRIPT V3
+-- With GitHub Auto-Sell + Improved Optimizations
+-- ========================================================
 -- 0. JEDA SINGKAT (3 DETIK)
 -- ========================================================
 task.wait(3)
@@ -26,13 +29,16 @@ local StarterGui = game:GetService("StarterGui")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 
--- HELPER GET CHARACTER
+-- ========================================================
+-- HELPER FUNCTIONS
+-- ========================================================
+
 local function getCharacter()
     return LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 end
 
--- HELPER SHECKLES
 local function formatNumber(n)
     local num = tostring(n)
     return num:reverse():gsub("(%d%d%d)", "%1,"):reverse():gsub("^,", "")
@@ -57,13 +63,19 @@ local function getSheckles()
     return 0
 end
 
+local function formatTime(seconds)
+    local hours = math.floor(seconds / 3600)
+    local mins = math.floor((seconds % 3600) / 60)
+    local secs = seconds % 60
+    return string.format("%02d:%02d:%02d", hours, mins, secs)
+end
+
 -- ========================================================
 -- HELPER: CEK STATUS DAILY DEALS (IMPROVED - v2)
 -- ========================================================
 local function checkDailyDeals()
     local isReady = false
     pcall(function()
-        -- 1. Cek dari Data Pemain (BoolValue)
         local data = LocalPlayer:FindFirstChild("Data") 
             or LocalPlayer:FindFirstChild("PlayerData") 
             or LocalPlayer:FindFirstChild("leaderstats")
@@ -75,19 +87,16 @@ local function checkDailyDeals()
                 or data:FindFirstChild("Daily")
             
             if daily and daily:IsA("BoolValue") then
-                -- INVERTED: If claimed (true) = NOT ready
                 if daily.Value then
                     isReady = false
                     return
                 else
-                    -- If not claimed (false) = ready
                     isReady = true
                     return
                 end
             end
         end
 
-        -- 2. Cek Cooldown di ReplicatedStorage
         local shopData = ReplicatedStorage:FindFirstChild("ShopData") 
             or ReplicatedStorage:FindFirstChild("DailyDeals") 
             or ReplicatedStorage:FindFirstChild("DailyShop")
@@ -99,51 +108,19 @@ local function checkDailyDeals()
                     isReady = true
                     return
                 else
-                    -- Still on cooldown
                     isReady = false
                     return
                 end
             end
         end
-
-        -- 3. DISABLED - GUI text detection (too many false positives)
-        -- Uncomment if needed, but usually Method 1 & 2 are more reliable
-        
-        --[[
-        local playerGui = LocalPlayer:FindFirstChild("PlayerGui")
-        if playerGui then
-            for _, guiElement in ipairs(playerGui:GetDescendants()) do
-                if guiElement:IsA("TextButton") and guiElement.Visible and guiElement.Active then
-                    local text = string.lower(guiElement.Text)
-                    local name = string.lower(guiElement.Name)
-                    
-                    -- Very strict: Button must say "Claim Daily" or similar
-                    if (string.find(text, "^claim daily") or string.find(text, "^daily claim")) 
-                        and not string.find(text, "claimed") 
-                        and not string.find(text, "cooldown") 
-                        and not string.find(text, "hours?")
-                        and not string.find(text, "wait") then
-                        isReady = true
-                        break
-                    end
-                end
-            end
-        end
-        ]]--
     end)
     return isReady
 end
 
 -- ========================================================
--- FUNGSI LOGIKA SELL BUAH (UPDATED - GitHub Method)
+-- FUNGSI LOGIKA SELL BUAH (GitHub Method)
 -- ========================================================
--- Source: https://github.com/Lutosys/opensrc/blob/main/gag2autosell.lua
--- Method: Networking.NPCS.SellAll:Fire()
--- ========================================================
-
 local Networking = nil
-
--- Load Networking module once at startup
 pcall(function()
     Networking = require(ReplicatedStorage.SharedModules.Networking)
 end)
@@ -151,17 +128,14 @@ end)
 local function sellFruits()
     local success = false
 
-    -- METHOD 1: GitHub Method (PROVEN WORKING)
     if Networking and Networking.NPCS and Networking.NPCS.SellAll then
         pcall(function()
             Networking.NPCS.SellAll:Fire()
             success = true
         end)
-        
         if success then return end
     end
 
-    -- METHOD 2: Fallback - Search for RemoteEvent/RemoteFunction
     pcall(function()
         local sellRemote = ReplicatedStorage:FindFirstChild("Sell", true) 
             or ReplicatedStorage:FindFirstChild("SellFruit", true)
@@ -181,7 +155,6 @@ local function sellFruits()
 
     if success then return end
 
-    -- METHOD 3: Last Resort - Tool-based selling
     pcall(function()
         local char = getCharacter()
         local backpack = LocalPlayer:FindFirstChild("Backpack")
@@ -209,63 +182,37 @@ local function sellFruits()
 end
 
 -- ========================================================
--- 1. FPS LIMITER (Manual Frame Timing)
+-- 1. PRE-OPTIMIZATION (ENGINE LEVEL)
+-- ========================================================
+pcall(function()
+    if CONFIG.Disable3DRendering then
+        RunService:Set3dRenderingEnabled(false)
+    end
+
+    if CONFIG.DisableGameSounds then
+        UserSettings():GetService("UserGameSettings").MasterVolume = 0
+    end
+
+    -- Force Graphics Quality to Level 1 (Lowest)
+    UserSettings():GetService("UserGameSettings").SavedQualityLevel = Enum.SavedQualityLevel.Level01
+
+    if CONFIG.DisableCoreGui then
+        StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
+    end
+end)
+
+-- ========================================================
+-- 2. FPS LIMITER (Manual Frame Timing)
 -- ========================================================
 local TARGET_FPS = CONFIG.TargetFPS
 local FRAME_TIME = 1 / TARGET_FPS
 local lastFrame = os.clock()
 
 -- ========================================================
--- 2. PRE-OPTIMIZATION & TEXTURE/PARTICLE REMOVER
--- ========================================================
-pcall(function()
-    if CONFIG.Disable3DRendering then
-        pcall(function() RunService:Set3dRenderingEnabled(false) end)
-    end
-    if CONFIG.DisableGameSounds then
-        pcall(function() UserSettings():GetService("UserGameSettings").MasterVolume = 0 end)
-    end
-    if CONFIG.DisableCoreGui then
-        pcall(function() StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false) end)
-    end
-
-    if CONFIG.DisableLightingEffects then
-        Lighting.GlobalShadows = false
-        Lighting.FogEnd = 9e9
-        Lighting.Brightness = 0
-        for _, v in pairs(Lighting:GetChildren()) do
-            if v:IsA("PostEffect") or v:IsA("Atmosphere") or v:IsA("Sky") or v:IsA("Clouds") then
-                v:Destroy()
-            end
-        end
-    end
-
-    if CONFIG.ExtremeDestroy then
-        for _, v in pairs(Workspace:GetDescendants()) do
-            if CONFIG.DisableParticles and (v:IsA("ParticleEmitter") or v:IsA("Smoke") or v:IsA("Fire") or v:IsA("Sparkles")) then
-                v:Destroy()
-            elseif v:IsA("Decal") or v:IsA("Texture") then
-                v:Destroy()
-            elseif v:IsA("BasePart") and not v:IsA("MeshPart") then
-                v.Material = Enum.Material.SmoothPlastic
-                v.Reflectance = 0
-            end
-        end
-    end
-end)
-
--- ========================================================
--- 2. OVERLAY UI
+-- 3. BLACK OVERLAY UI
 -- ========================================================
 local fpsLabel, ramLabel, shecklesLabel, dailyDealsLabel, timerLabel
 local startTime = os.time()
-
-local function formatTime(seconds)
-    local hours = math.floor(seconds / 3600)
-    local mins = math.floor((seconds % 3600) / 60)
-    local secs = seconds % 60
-    return string.format("%02d:%02d:%02d", hours, mins, secs)
-end
 
 if CONFIG.ShowBlackOverlay then
     pcall(function()
@@ -285,6 +232,7 @@ if CONFIG.ShowBlackOverlay then
         background.Size = UDim2.new(1, 0, 1, 0)
         background.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
         background.BorderSizePixel = 0
+        background.Active = true
         background.Parent = screenGui
 
         local infoContainer = Instance.new("Frame")
@@ -299,7 +247,6 @@ if CONFIG.ShowBlackOverlay then
         uiCorner.CornerRadius = UDim.new(0, 8)
         uiCorner.Parent = infoContainer
 
-        -- 1. FPS Label
         fpsLabel = Instance.new("TextLabel")
         fpsLabel.Size = UDim2.new(1, -10, 0, 18)
         fpsLabel.Position = UDim2.new(0, 5, 0, 3)
@@ -308,10 +255,9 @@ if CONFIG.ShowBlackOverlay then
         fpsLabel.TextSize = 12
         fpsLabel.Font = Enum.Font.Code
         fpsLabel.TextXAlignment = Enum.TextXAlignment.Left
-        fpsLabel.Text = "FPS : " .. CONFIG.TargetFPS
+        fpsLabel.Text = "FPS : " .. TARGET_FPS
         fpsLabel.Parent = infoContainer
 
-        -- 2. RAM Label
         ramLabel = Instance.new("TextLabel")
         ramLabel.Size = UDim2.new(1, -10, 0, 18)
         ramLabel.Position = UDim2.new(0, 5, 0, 21)
@@ -323,7 +269,6 @@ if CONFIG.ShowBlackOverlay then
         ramLabel.Text = "RAM : Measuring..."
         ramLabel.Parent = infoContainer
 
-        -- 3. Sheckles Label
         shecklesLabel = Instance.new("TextLabel")
         shecklesLabel.Size = UDim2.new(1, -10, 0, 18)
         shecklesLabel.Position = UDim2.new(0, 5, 0, 39)
@@ -335,7 +280,6 @@ if CONFIG.ShowBlackOverlay then
         shecklesLabel.Text = "Sheckles : 0"
         shecklesLabel.Parent = infoContainer
 
-        -- 4. Daily Deals Status
         dailyDealsLabel = Instance.new("TextLabel")
         dailyDealsLabel.Size = UDim2.new(1, -10, 0, 18)
         dailyDealsLabel.Position = UDim2.new(0, 5, 0, 57)
@@ -347,7 +291,6 @@ if CONFIG.ShowBlackOverlay then
         dailyDealsLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
         dailyDealsLabel.Parent = infoContainer
 
-        -- 5. TOMBOL SELL
         local sellButton = Instance.new("TextButton")
         sellButton.Name = "SellButton"
         sellButton.Size = UDim2.new(1, -10, 0, 22)
@@ -372,7 +315,6 @@ if CONFIG.ShowBlackOverlay then
             sellButton.BackgroundColor3 = Color3.fromRGB(0, 170, 85)
         end)
 
-        -- 6. Time Elapsed Label
         timerLabel = Instance.new("TextLabel")
         timerLabel.Size = UDim2.new(1, -10, 0, 18)
         timerLabel.Position = UDim2.new(0, 5, 0, 107)
@@ -387,31 +329,41 @@ if CONFIG.ShowBlackOverlay then
 end
 
 -- ========================================================
--- 3. LOOP UI & FPS LIMITER (INTEGRATED)
+-- 4. FPS LIMITER & UI UPDATE LOOP (PreRender)
 -- ========================================================
-local lastUpdate = os.clock()
+local lastFpsUpdate = os.clock()
 local frameCount = 0
 
-RunService.Heartbeat:Connect(function()
-    -- FPS LIMITER
+RunService.PreRender:Connect(function()
     local now = os.clock()
     local delta = now - lastFrame
     
+    -- FPS Limiter: Hold frame until target frame time
     if delta < FRAME_TIME then
         local waitTill = now + (FRAME_TIME - delta)
         while os.clock() < waitTill do
-            -- Hold frame
+            -- Hold Frame
         end
     end
     
     lastFrame = os.clock()
     frameCount = frameCount + 1
     
-    -- UI UPDATE (every 0.5 seconds)
-    if now - lastUpdate >= 0.5 then
-        if fpsLabel then fpsLabel.Text = "FPS : " .. math.floor(frameCount / (now - lastUpdate)) end
-        if ramLabel then ramLabel.Text = "RAM : " .. math.floor(Stats:GetTotalMemoryUsageMb()) .. " MB" end
-        if shecklesLabel then shecklesLabel.Text = "Sheckles : " .. formatNumber(getSheckles()) end
+    -- UI Update: Every 0.5 seconds
+    if CONFIG.ShowBlackOverlay and (now - lastFpsUpdate >= 0.5) then
+        if fpsLabel then
+            local currentFps = math.floor(frameCount / (now - lastFpsUpdate))
+            fpsLabel.Text = "FPS : " .. currentFps
+        end
+        
+        if ramLabel then
+            local memoryMB = math.floor(Stats:GetTotalMemoryUsageMb())
+            ramLabel.Text = "RAM : " .. memoryMB .. " MB"
+        end
+        
+        if shecklesLabel then 
+            shecklesLabel.Text = "Sheckles : " .. formatNumber(getSheckles()) 
+        end
         
         if dailyDealsLabel then
             local isReady = checkDailyDeals()
@@ -424,17 +376,18 @@ RunService.Heartbeat:Connect(function()
             end
         end
 
-        if timerLabel then 
-            timerLabel.Text = "Time: " .. formatTime(os.time() - startTime) 
+        if timerLabel then
+            local elapsedTime = os.time() - startTime
+            timerLabel.Text = "Time: " .. formatTime(elapsedTime)
         end
         
         frameCount = 0
-        lastUpdate = now
+        lastFpsUpdate = now
     end
 end)
 
 -- ========================================================
--- 4. CLEANER RAM
+-- 5. AUTO RAM CLEANER
 -- ========================================================
 if CONFIG.AutoCleanRAM then
     task.spawn(function()
@@ -443,3 +396,101 @@ if CONFIG.AutoCleanRAM then
         end
     end)
 end
+
+-- ========================================================
+-- 6. ANTI-FALL PLATFORM
+-- ========================================================
+if CONFIG.AntiFallPlatform then
+    task.spawn(function()
+        pcall(function()
+            local hrp = Character and Character:WaitForChild("HumanoidRootPart", 5)
+            if hrp then
+                local platform = Instance.new("Part")
+                platform.Name = "SafePlatform"
+                platform.Size = Vector3.new(10000, 5, 10000)
+                platform.CFrame = CFrame.new(hrp.Position.X, hrp.Position.Y - 3.5, hrp.Position.Z)
+                platform.Anchored = true
+                platform.CanCollide = true
+                platform.Transparency = 0.8
+                platform.Color = Color3.fromRGB(0, 150, 255)
+                platform.Material = Enum.Material.SmoothPlastic
+                platform.Parent = Workspace
+            end
+        end)
+    end)
+end
+
+-- ========================================================
+-- 7. EXTREME OPTIMIZATION (AGGRESSIVE CLEANUP)
+-- ========================================================
+task.spawn(function()
+    pcall(function()
+        -- Lighting cleanup
+        Lighting.GlobalShadows = false
+        Lighting.FogEnd = 9e9
+        Lighting.Brightness = 1
+        
+        if CONFIG.DisableLightingEffects then
+            for _, v in ipairs(Lighting:GetChildren()) do
+                pcall(function() v:Destroy() end)
+            end
+        end
+        
+        -- Clear terrain
+        if Workspace.Terrain then
+            Workspace.Terrain:Clear()
+        end
+    end)
+
+    -- Destroy workspace objects (except character)
+    if CONFIG.ExtremeDestroy then
+        local children = Workspace:GetChildren()
+        for i, child in ipairs(children) do
+            pcall(function()
+                if child ~= Character 
+                   and not Players:GetPlayerFromCharacter(child) 
+                   and child.Name ~= "Camera" 
+                   and child.Name ~= "Terrain" 
+                   and child.Name ~= "SafePlatform" then
+                   
+                    child:Destroy()
+                end
+            end)
+            
+            if i % 20 == 0 then
+                task.wait(0.03)
+            end
+        end
+    end
+
+    -- Clean descendants (particles, sounds, textures)
+    local descendants = Workspace:GetDescendants()
+    for i, v in ipairs(descendants) do
+        pcall(function()
+            if CONFIG.DisableParticles and (
+                v:IsA("ParticleEmitter") or v:IsA("Trail") or 
+                v:IsA("Beam") or v:IsA("Smoke") or 
+                v:IsA("Fire") or v:IsA("Sparkles")) then
+                v:Destroy()
+            elseif CONFIG.DisableGameSounds and v:IsA("Sound") then
+                v:Stop()
+                v:Destroy()
+            elseif v:IsA("Decal") or v:IsA("Texture") then
+                v:Destroy()
+            elseif v:IsA("BasePart") and not v:IsDescendantOf(Character) and v.Name ~= "SafePlatform" then
+                v.Material = Enum.Material.SmoothPlastic
+                v.Reflectance = 0
+                v.CastShadow = false
+            end
+        end)
+        
+        if i % 30 == 0 then
+            task.wait(0.03)
+        end
+    end
+
+    -- Final cleanup
+    pcall(function()
+        collectgarbage("collect")
+    end)
+end)
