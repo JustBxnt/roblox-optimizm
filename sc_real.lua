@@ -247,29 +247,17 @@ if CONFIG.ShowBlackOverlay then
         uiCorner.CornerRadius = UDim.new(0, 8)
         uiCorner.Parent = infoContainer
 
-        -- 1. FPS Label (Left Side)
+        -- 1. FPS + Player Name Label (Combined in one line)
         fpsLabel = Instance.new("TextLabel")
-        fpsLabel.Size = UDim2.new(0.5, -5, 0, 18)
+        fpsLabel.Size = UDim2.new(1, -10, 0, 18)
         fpsLabel.Position = UDim2.new(0, 5, 0, 3)
         fpsLabel.BackgroundTransparency = 1
         fpsLabel.TextColor3 = Color3.fromRGB(0, 255, 127)
         fpsLabel.TextSize = 12
         fpsLabel.Font = Enum.Font.Code
         fpsLabel.TextXAlignment = Enum.TextXAlignment.Left
-        fpsLabel.Text = "FPS : " .. TARGET_FPS
+        fpsLabel.Text = "FPS : " .. TARGET_FPS .. " | " .. LocalPlayer.Name
         fpsLabel.Parent = infoContainer
-
-        -- 1b. Player Name Label (Right Side)
-        local playerLabel = Instance.new("TextLabel")
-        playerLabel.Size = UDim2.new(0.5, -5, 0, 18)
-        playerLabel.Position = UDim2.new(0.5, 0, 0, 3)
-        playerLabel.BackgroundTransparency = 1
-        playerLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        playerLabel.TextSize = 12
-        playerLabel.Font = Enum.Font.Code
-        playerLabel.TextXAlignment = Enum.TextXAlignment.Right
-        playerLabel.Text = LocalPlayer.Name
-        playerLabel.Parent = infoContainer
 
         ramLabel = Instance.new("TextLabel")
         ramLabel.Size = UDim2.new(1, -10, 0, 18)
@@ -366,7 +354,7 @@ RunService.PreRender:Connect(function()
     if CONFIG.ShowBlackOverlay and (now - lastFpsUpdate >= 0.5) then
         if fpsLabel then
             local currentFps = math.floor(frameCount / (now - lastFpsUpdate))
-            fpsLabel.Text = "FPS : " .. currentFps
+            fpsLabel.Text = "FPS : " .. currentFps .. " | " .. LocalPlayer.Name
         end
         
         if ramLabel then
