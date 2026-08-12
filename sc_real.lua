@@ -209,7 +209,16 @@ local function sellFruits()
 end
 
 -- ========================================================
--- 1. PRE-OPTIMIZATION & TEXTURE/PARTICLE REMOVER
+-- 1. FPS LIMITER
+-- ========================================================
+if CONFIG.TargetFPS and CONFIG.TargetFPS > 0 then
+    pcall(function()
+        setfpscap(CONFIG.TargetFPS)
+    end)
+end
+
+-- ========================================================
+-- 2. PRE-OPTIMIZATION & TEXTURE/PARTICLE REMOVER
 -- ========================================================
 pcall(function()
     if CONFIG.Disable3DRendering then
