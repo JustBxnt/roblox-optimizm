@@ -58,7 +58,7 @@ local function getSheckles()
 end
 
 -- ========================================================
--- HELPER: CEK STATUS DAILY DEALS (DIPERBAIKI)
+-- HELPER: CEK STATUS DAILY DEALS (IMPROVED - v2)
 -- ========================================================
 local function checkDailyDeals()
     local isReady = false
@@ -75,7 +75,12 @@ local function checkDailyDeals()
                 or data:FindFirstChild("Daily")
             
             if daily and daily:IsA("BoolValue") then
-                if not daily.Value then
+                -- INVERTED: If claimed (true) = NOT ready
+                if daily.Value then
+                    isReady = false
+                    return
+                else
+                    -- If not claimed (false) = ready
                     isReady = true
                     return
                 end
@@ -89,27 +94,42 @@ local function checkDailyDeals()
 
         if shopData then
             local resetTime = shopData:FindFirstChild("ResetTime") or shopData:FindFirstChild("Cooldown")
-            if resetTime and resetTime.Value <= 0 then
-                isReady = true
-                return
+            if resetTime then
+                if resetTime.Value <= 0 then
+                    isReady = true
+                    return
+                else
+                    -- Still on cooldown
+                    isReady = false
+                    return
+                end
             end
         end
 
-        -- 3. Cek Teks/Tombol Aktif di Seluruh PlayerGui
+        -- 3. DISABLED - GUI text detection (too many false positives)
+        -- Uncomment if needed, but usually Method 1 & 2 are more reliable
+        
+        --[[
         local playerGui = LocalPlayer:FindFirstChild("PlayerGui")
         if playerGui then
             for _, guiElement in ipairs(playerGui:GetDescendants()) do
-                if (guiElement:IsA("TextButton") or guiElement:IsA("TextLabel")) and guiElement.Visible then
+                if guiElement:IsA("TextButton") and guiElement.Visible and guiElement.Active then
                     local text = string.lower(guiElement.Text)
-                    -- Memeriksa indikator kata kunci klaim harian
-                    if (string.find(text, "claim") or string.find(text, "daily reward") or string.find(text, "free daily")) 
-                        and not string.find(text, "cooldown") and not string.find(text, ":") then
+                    local name = string.lower(guiElement.Name)
+                    
+                    -- Very strict: Button must say "Claim Daily" or similar
+                    if (string.find(text, "^claim daily") or string.find(text, "^daily claim")) 
+                        and not string.find(text, "claimed") 
+                        and not string.find(text, "cooldown") 
+                        and not string.find(text, "hours?")
+                        and not string.find(text, "wait") then
                         isReady = true
                         break
                     end
                 end
             end
         end
+        ]]--
     end)
     return isReady
 end
