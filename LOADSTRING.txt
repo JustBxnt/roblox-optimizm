@@ -1,0 +1,57 @@
+==========================================
+ROBLOX OPTIMIZATION SCRIPT - LOADSTRING
+==========================================
+
+📦 LOADSTRING (Replace YOUR_USERNAME):
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/YOUR_USERNAME/roblox-optimizm/main/sc_real.lua"))()
+
+
+==========================================
+EXAMPLE (if username is JustBxnt):
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/JustBxnt/roblox-optimizm/main/sc_real.lua"))()
+
+
+==========================================
+STEPS TO USE:
+
+1. Create repo on GitHub (name: roblox-optimizm)
+2. Make repo PUBLIC
+3. Run: push_to_github.bat
+4. Wait 1-2 minutes
+5. Copy loadstring above
+6. Paste in Roblox executor
+7. Execute!
+
+
+==========================================
+FEATURES:
+
+✅ FPS Limiter (2 FPS)
+✅ Black Overlay UI
+✅ RAM Monitor
+✅ Sheckles Display
+✅ Auto-Sell Fruits (GitHub method)
+✅ Daily Deals Checker
+✅ Timer
+✅ RAM Auto Cleaner
+✅ Extreme Optimization
+
+
+==========================================
+GAME SUPPORT:
+
+Currently optimized for: Growing A Garden 2
+
+
+==========================================
+VERIFY UPLOAD:
+
+Check if file is accessible:
+https://raw.githubusercontent.com/YOUR_USERNAME/roblox-optimizm/main/sc_real.lua
+
+Should show Lua code in browser.
+
+
+==========================================
