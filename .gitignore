@@ -1,0 +1,32 @@
+# Roblox Script Repo
+
+# Test files
+*_test.lua
+*_debug.lua
+test_*.lua
+debug_*.lua
+
+# Backup files
+*.bak
+*_backup.lua
+*.backup
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+temp/
+tmp/
