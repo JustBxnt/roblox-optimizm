@@ -209,13 +209,11 @@ local function sellFruits()
 end
 
 -- ========================================================
--- 1. FPS LIMITER
+-- 1. FPS LIMITER (Manual Frame Timing)
 -- ========================================================
-if CONFIG.TargetFPS and CONFIG.TargetFPS > 0 then
-    pcall(function()
-        setfpscap(CONFIG.TargetFPS)
-    end)
-end
+local TARGET_FPS = CONFIG.TargetFPS
+local FRAME_TIME = 1 / TARGET_FPS
+local lastFrame = os.clock()
 
 -- ========================================================
 -- 2. PRE-OPTIMIZATION & TEXTURE/PARTICLE REMOVER
@@ -389,15 +387,27 @@ if CONFIG.ShowBlackOverlay then
 end
 
 -- ========================================================
--- 3. LOOP UI & FPS
+-- 3. LOOP UI & FPS LIMITER (INTEGRATED)
 -- ========================================================
 local lastUpdate = os.clock()
 local frameCount = 0
 
 RunService.Heartbeat:Connect(function()
-    frameCount = frameCount + 1
+    -- FPS LIMITER
     local now = os.clock()
+    local delta = now - lastFrame
     
+    if delta < FRAME_TIME then
+        local waitTill = now + (FRAME_TIME - delta)
+        while os.clock() < waitTill do
+            -- Hold frame
+        end
+    end
+    
+    lastFrame = os.clock()
+    frameCount = frameCount + 1
+    
+    -- UI UPDATE (every 0.5 seconds)
     if now - lastUpdate >= 0.5 then
         if fpsLabel then fpsLabel.Text = "FPS : " .. math.floor(frameCount / (now - lastUpdate)) end
         if ramLabel then ramLabel.Text = "RAM : " .. math.floor(Stats:GetTotalMemoryUsageMb()) .. " MB" end
