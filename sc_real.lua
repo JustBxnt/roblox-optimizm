@@ -1,6 +1,7 @@
 -- ========================================================
--- ROBLOX OPTIMIZATION SCRIPT V3
--- With GitHub Auto-Sell + Improved Optimizations
+-- ROBLOX OPTIMIZATION SCRIPT V4 (ULTRA RAM REDUCTION)
+-- With GitHub Auto-Sell + 5 Ultra Optimizations
+-- Target: 130-140 MB RAM (down from 200 MB)
 -- ========================================================
 -- 0. JEDA SINGKAT (3 DETIK)
 -- ========================================================
@@ -17,7 +18,13 @@ local CONFIG = {
     Disable3DRendering    = true,  
     DisableCoreGui        = true,  
     AutoCleanRAM          = true,  
-    CleanRAMInterval      = 15     
+    CleanRAMInterval      = 10,    -- Changed from 15 to 10 for more aggressive GC
+    
+    -- NEW FEATURES (v4 - Ultra RAM Reduction)
+    DisableAnimations     = true,  -- Stop all character animations
+    RemoveAccessories     = true,  -- Remove all character accessories (hats, clothes)
+    FreezeCamera          = true,  -- Freeze camera position
+    DisableCollisions     = true   -- Disable character collisions
 }
 
 local Players = game:GetService("Players")
@@ -202,6 +209,65 @@ pcall(function()
 end)
 
 -- ========================================================
+-- 1.5. ULTRA RAM OPTIMIZATIONS (v4)
+-- ========================================================
+
+-- Feature 1: Disable All Character Animations
+if CONFIG.DisableAnimations then
+    task.spawn(function()
+        pcall(function()
+            local humanoid = Character:FindFirstChild("Humanoid")
+            if humanoid then
+                for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
+                    track:Stop()
+                    track:Destroy()
+                end
+                humanoid.AnimationPlayed:Connect(function(track)
+                    track:Stop()
+                end)
+            end
+        end)
+    end)
+end
+
+-- Feature 2: Remove All Character Accessories
+if CONFIG.RemoveAccessories then
+    task.spawn(function()
+        pcall(function()
+            for _, accessory in pairs(Character:GetChildren()) do
+                if accessory:IsA("Accessory") then
+                    accessory:Destroy()
+                end
+            end
+        end)
+    end)
+end
+
+-- Feature 3: Freeze Camera Position
+if CONFIG.FreezeCamera then
+    task.spawn(function()
+        pcall(function()
+            local camera = Workspace.CurrentCamera
+            camera.CameraType = Enum.CameraType.Scriptable
+            camera.CFrame = CFrame.new(0, 10000, 0)
+        end)
+    end)
+end
+
+-- Feature 4: Disable Character Collisions
+if CONFIG.DisableCollisions then
+    task.spawn(function()
+        pcall(function()
+            for _, part in pairs(Character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+        end)
+    end)
+end
+
+-- ========================================================
 -- 2. FPS LIMITER (Manual Frame Timing)
 -- ========================================================
 local TARGET_FPS = CONFIG.TargetFPS
@@ -249,15 +315,14 @@ if CONFIG.ShowBlackOverlay then
 
         -- 1. FPS + Player Name Label (Combined in one line)
         fpsLabel = Instance.new("TextLabel")
-        fpsLabel.Size = UDim2.new(1, -10, 0, 16)
+        fpsLabel.Size = UDim2.new(1, -10, 0, 18)
         fpsLabel.Position = UDim2.new(0, 5, 0, 3)
         fpsLabel.BackgroundTransparency = 1
         fpsLabel.TextColor3 = Color3.fromRGB(0, 255, 127)
-        fpsLabel.TextSize = 11  -- Dikurangi dari 12 ke 11
+        fpsLabel.TextSize = 12
         fpsLabel.Font = Enum.Font.Code
         fpsLabel.TextXAlignment = Enum.TextXAlignment.Left
-        fpsLabel.Text = "FPS:" .. TARGET_FPS .. " | " .. LocalPlayer.Name
-        fpsLabel.TextScaled = false
+        fpsLabel.Text = "FPS : " .. TARGET_FPS .. " | " .. LocalPlayer.Name
         fpsLabel.Parent = infoContainer
 
         ramLabel = Instance.new("TextLabel")
@@ -355,7 +420,7 @@ RunService.PreRender:Connect(function()
     if CONFIG.ShowBlackOverlay and (now - lastFpsUpdate >= 0.5) then
         if fpsLabel then
             local currentFps = math.floor(frameCount / (now - lastFpsUpdate))
-            fpsLabel.Text = "FPS:" .. currentFps .. " | " .. LocalPlayer.Name
+            fpsLabel.Text = "FPS : " .. currentFps .. " | " .. LocalPlayer.Name
         end
         
         if ramLabel then
