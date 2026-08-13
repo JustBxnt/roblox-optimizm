@@ -407,7 +407,7 @@ if CONFIG.ShowBlackOverlay then
 
         -- 2. RAM Label (Left side only, no button here yet)
         ramLabel = Instance.new("TextLabel")
-        ramLabel.Size = UDim2.new(0, 95, 0, 18)  -- Reduced from 120 to 95
+        ramLabel.Size = UDim2.new(0, 85, 0, 18)  -- Reduced from 95 to 85
         ramLabel.Position = UDim2.new(0, 5, 0, 21)
         ramLabel.BackgroundTransparency = 1
         ramLabel.TextColor3 = Color3.fromRGB(0, 191, 255)
@@ -417,20 +417,20 @@ if CONFIG.ShowBlackOverlay then
         ramLabel.Text = "RAM : Measuring..."
         ramLabel.Parent = infoContainer
 
-        -- 2b. SELL Button (Right side of RAM, more compact)
+        -- 2b. SELL Button (Right side of RAM, super compact & close)
         local sellButton = Instance.new("TextButton")
         sellButton.Name = "SellButton"
-        sellButton.Size = UDim2.new(0, 55, 0, 16)  -- Smaller: 55px width, 16px height
-        sellButton.Position = UDim2.new(0, 105, 0, 22)  -- Closer to RAM: x=105 (was 130)
+        sellButton.Size = UDim2.new(0, 50, 0, 16)  -- Even smaller: 50px width
+        sellButton.Position = UDim2.new(0, 92, 0, 22)  -- Much closer: x=92 (was 105)
         sellButton.BackgroundColor3 = Color3.fromRGB(0, 170, 85)
         sellButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-        sellButton.TextSize = 9  -- Smaller text: 9 (was 10)
+        sellButton.TextSize = 9
         sellButton.Font = Enum.Font.SourceSansBold
         sellButton.Text = "SELL"
         sellButton.Parent = infoContainer
 
         local btnCorner = Instance.new("UICorner")
-        btnCorner.CornerRadius = UDim.new(0, 3)  -- Smaller radius: 3 (was 4)
+        btnCorner.CornerRadius = UDim.new(0, 3)
         btnCorner.Parent = sellButton
 
         sellButton.MouseButton1Click:Connect(function()
