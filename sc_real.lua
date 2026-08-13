@@ -405,32 +405,32 @@ if CONFIG.ShowBlackOverlay then
         fpsLabel.Text = "FPS : " .. TARGET_FPS .. " | " .. LocalPlayer.Name
         fpsLabel.Parent = infoContainer
 
-        -- 2. RAM Label (Left side only, no button here yet)
+        -- 2. RAM Label (Left side only, compact text)
         ramLabel = Instance.new("TextLabel")
-        ramLabel.Size = UDim2.new(0, 85, 0, 18)  -- Reduced from 95 to 85
+        ramLabel.Size = UDim2.new(0, 75, 0, 18)  -- Even smaller: 75px (was 85)
         ramLabel.Position = UDim2.new(0, 5, 0, 21)
         ramLabel.BackgroundTransparency = 1
         ramLabel.TextColor3 = Color3.fromRGB(0, 191, 255)
-        ramLabel.TextSize = 12
+        ramLabel.TextSize = 11  -- Smaller text: 11 (was 12)
         ramLabel.Font = Enum.Font.Code
         ramLabel.TextXAlignment = Enum.TextXAlignment.Left
         ramLabel.Text = "RAM : Measuring..."
         ramLabel.Parent = infoContainer
 
-        -- 2b. SELL Button (Right side of RAM, super compact & close)
+        -- 2b. SELL Button (Ultra compact, right next to RAM)
         local sellButton = Instance.new("TextButton")
         sellButton.Name = "SellButton"
-        sellButton.Size = UDim2.new(0, 50, 0, 16)  -- Even smaller: 50px width
-        sellButton.Position = UDim2.new(0, 92, 0, 22)  -- Much closer: x=92 (was 105)
+        sellButton.Size = UDim2.new(0, 40, 0, 14)  -- Tiny: 40px × 14px
+        sellButton.Position = UDim2.new(0, 82, 0, 23)  -- Super close: x=82 (was 92)
         sellButton.BackgroundColor3 = Color3.fromRGB(0, 170, 85)
         sellButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-        sellButton.TextSize = 9
+        sellButton.TextSize = 8  -- Very small text: 8 (was 9)
         sellButton.Font = Enum.Font.SourceSansBold
         sellButton.Text = "SELL"
         sellButton.Parent = infoContainer
 
         local btnCorner = Instance.new("UICorner")
-        btnCorner.CornerRadius = UDim.new(0, 3)
+        btnCorner.CornerRadius = UDim.new(0, 2)  -- Smaller radius: 2 (was 3)
         btnCorner.Parent = sellButton
 
         sellButton.MouseButton1Click:Connect(function()
