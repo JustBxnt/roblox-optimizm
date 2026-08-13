@@ -382,7 +382,7 @@ if CONFIG.ShowBlackOverlay then
         background.Parent = screenGui
 
         local infoContainer = Instance.new("Frame")
-        infoContainer.Size = UDim2.new(0, 250, 0, 138)  -- Diperlebar dari 195 ke 250
+        infoContainer.Size = UDim2.new(0, 250, 0, 98)  -- Reduced from 138 to 98 (removed button row)
         infoContainer.Position = UDim2.new(0, 10, 0, 10)
         infoContainer.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
         infoContainer.BackgroundTransparency = 0.3
@@ -405,8 +405,9 @@ if CONFIG.ShowBlackOverlay then
         fpsLabel.Text = "FPS : " .. TARGET_FPS .. " | " .. LocalPlayer.Name
         fpsLabel.Parent = infoContainer
 
+        -- 2. RAM Label (Left side only, no button here yet)
         ramLabel = Instance.new("TextLabel")
-        ramLabel.Size = UDim2.new(1, -10, 0, 18)
+        ramLabel.Size = UDim2.new(0, 120, 0, 18)  -- Fixed width for RAM text
         ramLabel.Position = UDim2.new(0, 5, 0, 21)
         ramLabel.BackgroundTransparency = 1
         ramLabel.TextColor3 = Color3.fromRGB(0, 191, 255)
@@ -416,37 +417,16 @@ if CONFIG.ShowBlackOverlay then
         ramLabel.Text = "RAM : Measuring..."
         ramLabel.Parent = infoContainer
 
-        shecklesLabel = Instance.new("TextLabel")
-        shecklesLabel.Size = UDim2.new(1, -10, 0, 18)
-        shecklesLabel.Position = UDim2.new(0, 5, 0, 39)
-        shecklesLabel.BackgroundTransparency = 1
-        shecklesLabel.TextColor3 = Color3.fromRGB(255, 215, 0)
-        shecklesLabel.TextSize = 12
-        shecklesLabel.Font = Enum.Font.Code
-        shecklesLabel.TextXAlignment = Enum.TextXAlignment.Left
-        shecklesLabel.Text = "Sheckles : 0"
-        shecklesLabel.Parent = infoContainer
-
-        dailyDealsLabel = Instance.new("TextLabel")
-        dailyDealsLabel.Size = UDim2.new(1, -10, 0, 18)
-        dailyDealsLabel.Position = UDim2.new(0, 5, 0, 57)
-        dailyDealsLabel.BackgroundTransparency = 1
-        dailyDealsLabel.TextSize = 12
-        dailyDealsLabel.Font = Enum.Font.Code
-        dailyDealsLabel.TextXAlignment = Enum.TextXAlignment.Left
-        dailyDealsLabel.Text = "Daily Deals : Checking..."
-        dailyDealsLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-        dailyDealsLabel.Parent = infoContainer
-
+        -- 2b. SELL Button (Right side of RAM)
         local sellButton = Instance.new("TextButton")
         sellButton.Name = "SellButton"
-        sellButton.Size = UDim2.new(1, -10, 0, 22)
-        sellButton.Position = UDim2.new(0, 5, 0, 80)
+        sellButton.Size = UDim2.new(0, 115, 0, 18)  -- Small button next to RAM
+        sellButton.Position = UDim2.new(0, 130, 0, 21)  -- Right side of RAM
         sellButton.BackgroundColor3 = Color3.fromRGB(0, 170, 85)
         sellButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-        sellButton.TextSize = 12
+        sellButton.TextSize = 10
         sellButton.Font = Enum.Font.SourceSansBold
-        sellButton.Text = "SELL ALL FRUITS"
+        sellButton.Text = "SELL"
         sellButton.Parent = infoContainer
 
         local btnCorner = Instance.new("UICorner")
@@ -458,13 +438,38 @@ if CONFIG.ShowBlackOverlay then
             sellButton.BackgroundColor3 = Color3.fromRGB(200, 100, 0)
             sellFruits()
             task.wait(1)
-            sellButton.Text = "SELL ALL FRUITS"
+            sellButton.Text = "SELL"
             sellButton.BackgroundColor3 = Color3.fromRGB(0, 170, 85)
         end)
 
+        -- 3. Sheckles Label
+        shecklesLabel = Instance.new("TextLabel")
+        shecklesLabel.Size = UDim2.new(1, -10, 0, 18)
+        shecklesLabel.Position = UDim2.new(0, 5, 0, 39)
+        shecklesLabel.BackgroundTransparency = 1
+        shecklesLabel.TextColor3 = Color3.fromRGB(255, 215, 0)
+        shecklesLabel.TextSize = 12
+        shecklesLabel.Font = Enum.Font.Code
+        shecklesLabel.TextXAlignment = Enum.TextXAlignment.Left
+        shecklesLabel.Text = "Sheckles : 0"
+        shecklesLabel.Parent = infoContainer
+
+        -- 4. Daily Deals Label
+        dailyDealsLabel = Instance.new("TextLabel")
+        dailyDealsLabel.Size = UDim2.new(1, -10, 0, 18)
+        dailyDealsLabel.Position = UDim2.new(0, 5, 0, 57)
+        dailyDealsLabel.BackgroundTransparency = 1
+        dailyDealsLabel.TextSize = 12
+        dailyDealsLabel.Font = Enum.Font.Code
+        dailyDealsLabel.TextXAlignment = Enum.TextXAlignment.Left
+        dailyDealsLabel.Text = "Daily Deals : Checking..."
+        dailyDealsLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+        dailyDealsLabel.Parent = infoContainer
+
+        -- 5. Timer Label
         timerLabel = Instance.new("TextLabel")
         timerLabel.Size = UDim2.new(1, -10, 0, 18)
-        timerLabel.Position = UDim2.new(0, 5, 0, 107)
+        timerLabel.Position = UDim2.new(0, 5, 0, 75)  -- Moved up from 107
         timerLabel.BackgroundTransparency = 1
         timerLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
         timerLabel.TextSize = 12
