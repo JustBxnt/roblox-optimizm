@@ -1,7 +1,7 @@
 -- ========================================================
--- ROBLOX OPTIMIZATION SCRIPT V4 (ULTRA RAM REDUCTION)
--- With GitHub Auto-Sell + 5 Ultra Optimizations
--- Target: 130-140 MB RAM (down from 200 MB)
+-- ROBLOX OPTIMIZATION SCRIPT V5 (EXTREME RAM REDUCTION)
+-- With GitHub Auto-Sell + 10 Ultra Optimizations
+-- Target: 98-108 MB RAM (down from 200 MB)
 -- ========================================================
 -- 0. JEDA SINGKAT (3 DETIK)
 -- ========================================================
@@ -24,7 +24,14 @@ local CONFIG = {
     DisableAnimations     = true,  -- Stop all character animations
     RemoveAccessories     = true,  -- Remove all character accessories (hats, clothes)
     FreezeCamera          = true,  -- Freeze camera position
-    DisableCollisions     = true   -- Disable character collisions
+    DisableCollisions     = true,  -- Disable character collisions
+    
+    -- EXTRA FEATURES (v5 - Extreme RAM Reduction)
+    BodyTransparency      = true,  -- Make character invisible (transparency = 1)
+    DisableHealthDisplay  = true,  -- Hide health bar & name display
+    DisableHumanoidStates = true,  -- Disable unused humanoid states (swimming, climbing, etc)
+    RemoveAnimator        = true,  -- Remove animator object (more aggressive than DisableAnimations)
+    ForceMobileMode       = true   -- Force mobile rendering mode (lower quality)
 }
 
 local Players = game:GetService("Players")
@@ -263,6 +270,79 @@ if CONFIG.DisableCollisions then
                     part.CanCollide = false
                 end
             end
+        end)
+    end)
+end
+
+-- ========================================================
+-- 1.6. EXTRA RAM OPTIMIZATIONS (v5 - EXTREME)
+-- ========================================================
+
+-- Feature 5: Body Transparency (Invisible Character)
+if CONFIG.BodyTransparency then
+    task.spawn(function()
+        pcall(function()
+            for _, part in pairs(Character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.Transparency = 1
+                elseif part:IsA("Decal") or part:IsA("Texture") then
+                    part.Transparency = 1
+                end
+            end
+        end)
+    end)
+end
+
+-- Feature 6: Disable Health & Name Display
+if CONFIG.DisableHealthDisplay then
+    task.spawn(function()
+        pcall(function()
+            local humanoid = Character:FindFirstChild("Humanoid")
+            if humanoid then
+                humanoid.HealthDisplayDistance = 0
+                humanoid.NameDisplayDistance = 0
+            end
+        end)
+    end)
+end
+
+-- Feature 7: Disable Unused Humanoid States
+if CONFIG.DisableHumanoidStates then
+    task.spawn(function()
+        pcall(function()
+            local humanoid = Character:FindFirstChild("Humanoid")
+            if humanoid then
+                humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming, false)
+                humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing, false)
+                humanoid:SetStateEnabled(Enum.HumanoidStateType.Flying, false)
+                humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
+                humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+            end
+        end)
+    end)
+end
+
+-- Feature 8: Remove Animator (More Aggressive)
+if CONFIG.RemoveAnimator then
+    task.spawn(function()
+        pcall(function()
+            local humanoid = Character:FindFirstChild("Humanoid")
+            if humanoid then
+                local animator = humanoid:FindFirstChildOfClass("Animator")
+                if animator then
+                    animator:Destroy()
+                end
+            end
+        end)
+    end)
+end
+
+-- Feature 9: Force Mobile Mode
+if CONFIG.ForceMobileMode then
+    task.spawn(function()
+        pcall(function()
+            local UserInputService = game:GetService("UserInputService")
+            UserInputService.TouchEnabled = true
         end)
     end)
 end
