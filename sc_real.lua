@@ -196,6 +196,134 @@ local function sellFruits()
 end
 
 -- ========================================================
+-- SKIP TUTORIAL FUNCTION (ALL METHODS)
+-- Auto-run every 5 minutes
+-- ========================================================
+local function skipTutorial()
+    -- Method 1: Fire RemoteEvent
+    task.spawn(function()
+        pcall(function()
+            for _, remote in pairs(ReplicatedStorage:GetDescendants()) do
+                if remote:IsA("RemoteEvent") then
+                    local name = remote.Name:lower()
+                    if name:find("skip") or name:find("tutorial") or name:find("complete") then
+                        remote:FireServer()
+                        remote:FireServer(true)
+                        remote:FireServer("skip")
+                        return
+                    end
+                elseif remote:IsA("RemoteFunction") then
+                    local name = remote.Name:lower()
+                    if name:find("skip") or name:find("tutorial") or name:find("complete") then
+                        pcall(function()
+                            remote:InvokeServer()
+                            remote:InvokeServer(true)
+                        end)
+                        return
+                    end
+                end
+            end
+        end)
+    end)
+    
+    -- Method 2: Set tutorial flags
+    task.spawn(function()
+        pcall(function()
+            local data = LocalPlayer:FindFirstChild("Data") or LocalPlayer:FindFirstChild("PlayerData")
+            if data then
+                for _, flag in pairs(data:GetChildren()) do
+                    local name = flag.Name:lower()
+                    if name:find("tutorial") or name:find("intro") or name:find("first") then
+                        if flag:IsA("BoolValue") then
+                            flag.Value = true
+                            return
+                        elseif flag:IsA("IntValue") or flag:IsA("NumberValue") then
+                            flag.Value = 1
+                            return
+                        end
+                    end
+                end
+            end
+        end)
+    end)
+    
+    -- Method 3: Remove tutorial GUIs
+    task.spawn(function()
+        pcall(function()
+            local playerGui = LocalPlayer:WaitForChild("PlayerGui")
+            for _, gui in pairs(playerGui:GetChildren()) do
+                local name = gui.Name:lower()
+                if name:find("tutorial") or name:find("intro") or name:find("guide") or name:find("cutscene") then
+                    gui:Destroy()
+                    return
+                end
+            end
+        end)
+    end)
+    
+    -- Method 4: Click skip buttons
+    task.spawn(function()
+        task.wait(0.3)
+        pcall(function()
+            local playerGui = LocalPlayer:WaitForChild("PlayerGui")
+            for _, button in pairs(playerGui:GetDescendants()) do
+                if button:IsA("TextButton") or button:IsA("ImageButton") then
+                    local text = (button.Text or button.Name or ""):lower()
+                    if text:find("skip") or text:find("continue") or text:find("next") or 
+                       text:find("close") or text:find("ok") or text:find("start") then
+                        pcall(function()
+                            for _, conn in pairs(getconnections(button.MouseButton1Click)) do
+                                conn:Fire()
+                            end
+                        end)
+                        return
+                    end
+                end
+            end
+        end)
+    end)
+    
+    -- Method 5: Networking module
+    task.spawn(function()
+        pcall(function()
+            if Networking then
+                if Networking.Tutorial then
+                    if Networking.Tutorial.Skip then 
+                        Networking.Tutorial.Skip:Fire()
+                        return
+                    elseif Networking.Tutorial.Complete then 
+                        Networking.Tutorial.Complete:Fire()
+                        return
+                    end
+                end
+                
+                if Networking.Player then
+                    if Networking.Player.SkipTutorial then 
+                        Networking.Player.SkipTutorial:Fire()
+                        return
+                    end
+                end
+            end
+        end)
+    end)
+    
+    -- Method 6: Fire ProximityPrompt
+    task.spawn(function()
+        pcall(function()
+            for _, obj in pairs(Workspace:GetDescendants()) do
+                if obj:IsA("ProximityPrompt") then
+                    local name = obj.Name:lower()
+                    if name:find("skip") or name:find("tutorial") then
+                        fireproximityprompt(obj)
+                        return
+                    end
+                end
+            end
+        end)
+    end)
+end
+
+-- ========================================================
 -- 1. PRE-OPTIMIZATION (ENGINE LEVEL)
 -- ========================================================
 pcall(function()
@@ -645,4 +773,15 @@ task.spawn(function()
     pcall(function()
         collectgarbage("collect")
     end)
+end)
+
+-- ========================================================
+-- 8. AUTO SKIP TUTORIAL (Every 5 minutes)
+-- ========================================================
+task.spawn(function()
+    while task.wait(300) do  -- 300 seconds = 5 minutes
+        pcall(function()
+            skipTutorial()
+        end)
+    end
 end)
