@@ -533,42 +533,17 @@ if CONFIG.ShowBlackOverlay then
         fpsLabel.Text = "FPS : " .. TARGET_FPS .. " | " .. LocalPlayer.Name
         fpsLabel.Parent = infoContainer
 
-        -- 2. RAM Label (Left side only, compact text)
+        -- 2. RAM Label (Full width, no button)
         ramLabel = Instance.new("TextLabel")
-        ramLabel.Size = UDim2.new(0, 75, 0, 18)  -- Even smaller: 75px (was 85)
+        ramLabel.Size = UDim2.new(1, -10, 0, 18)
         ramLabel.Position = UDim2.new(0, 5, 0, 21)
         ramLabel.BackgroundTransparency = 1
         ramLabel.TextColor3 = Color3.fromRGB(0, 191, 255)
-        ramLabel.TextSize = 11  -- Smaller text: 11 (was 12)
+        ramLabel.TextSize = 12
         ramLabel.Font = Enum.Font.Code
         ramLabel.TextXAlignment = Enum.TextXAlignment.Left
         ramLabel.Text = "RAM : Measuring..."
         ramLabel.Parent = infoContainer
-
-        -- 2b. SELL Button (Ultra compact, right next to RAM)
-        local sellButton = Instance.new("TextButton")
-        sellButton.Name = "SellButton"
-        sellButton.Size = UDim2.new(0, 40, 0, 14)  -- Tiny: 40px × 14px
-        sellButton.Position = UDim2.new(0, 82, 0, 23)  -- Super close: x=82 (was 92)
-        sellButton.BackgroundColor3 = Color3.fromRGB(0, 170, 85)
-        sellButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-        sellButton.TextSize = 8  -- Very small text: 8 (was 9)
-        sellButton.Font = Enum.Font.SourceSansBold
-        sellButton.Text = "SELL"
-        sellButton.Parent = infoContainer
-
-        local btnCorner = Instance.new("UICorner")
-        btnCorner.CornerRadius = UDim.new(0, 2)  -- Smaller radius: 2 (was 3)
-        btnCorner.Parent = sellButton
-
-        sellButton.MouseButton1Click:Connect(function()
-            sellButton.Text = "SELLING..."
-            sellButton.BackgroundColor3 = Color3.fromRGB(200, 100, 0)
-            sellFruits()
-            task.wait(1)
-            sellButton.Text = "SELL"
-            sellButton.BackgroundColor3 = Color3.fromRGB(0, 170, 85)
-        end)
 
         -- 3. Sheckles Label
         shecklesLabel = Instance.new("TextLabel")
@@ -782,6 +757,19 @@ task.spawn(function()
     while task.wait(300) do  -- 300 seconds = 5 minutes
         pcall(function()
             skipTutorial()
+        end)
+    end
+end)
+
+-- ========================================================
+-- 9. AUTO SELL FRUITS (Every 10 minutes)
+-- ========================================================
+task.spawn(function()
+    while task.wait(600) do  -- 600 seconds = 10 minutes
+        pcall(function()
+            print("🍎 Auto-Sell: Running sellFruits()...")
+            sellFruits()
+            print("✅ Auto-Sell: Complete!")
         end)
     end
 end)
