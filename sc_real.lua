@@ -5,17 +5,17 @@
 -- ========================================================
 -- 0. JEDA SINGKAT (3 DETIK)
 -- ========================================================
-task.wait(60)
+task.wait(3)
 
 local CONFIG = {
-    TargetFPS              = 2,     
-    ShowBlackOverlay      = true,  
-    ExtremeDestroy        = true,  
+    TargetFPS              = 60,     
+    ShowBlackOverlay      = false,  
+    ExtremeDestroy        = false,  
     AntiFallPlatform      = true,  
     DisableGameSounds     = true,  
     DisableParticles      = true,  
     DisableLightingEffects= true,  
-    Disable3DRendering    = true,  
+    Disable3DRendering    = false,  
     DisableCoreGui        = true,  
     AutoCleanRAM          = true,  
     CleanRAMInterval      = 10,    -- Changed from 15 to 10 for more aggressive GC
@@ -23,11 +23,11 @@ local CONFIG = {
     -- NEW FEATURES (v4 - Ultra RAM Reduction)
     DisableAnimations     = true,  -- Stop all character animations
     RemoveAccessories     = true,  -- Remove all character accessories (hats, clothes)
-    FreezeCamera          = true,  -- Freeze camera position
+    FreezeCamera          = false,  -- Freeze camera position
     DisableCollisions     = true,  -- Disable character collisions
     
     -- EXTRA FEATURES (v5 - Extreme RAM Reduction)
-    BodyTransparency      = true,  -- Make character invisible (transparency = 1)
+    BodyTransparency      = false,  -- Make character invisible (transparency = 1)
     DisableHealthDisplay  = true,  -- Hide health bar & name display
     DisableHumanoidStates = true,  -- Disable unused humanoid states (swimming, climbing, etc)
     RemoveAnimator        = true,  -- Remove animator object (more aggressive than DisableAnimations)
