@@ -5,17 +5,18 @@
 -- ========================================================
 -- 0. JEDA SINGKAT (3 DETIK)
 -- ========================================================
-task.wait(60)
+task.wait(3)
 
 local CONFIG = {
-    TargetFPS              = 2,     
-    ShowBlackOverlay      = true,  
-    ExtremeDestroy        = true,  
-    AntiFallPlatform      = true,  
+    TargetFPS              = 60,     
+    ShowBlackOverlay      = false,  
+    ExtremeDestroy        = false,  -- Destroy objects completely (dangerous for steal scripts)
+    HideExtreme           = true,   -- NEW: Hide objects instead of destroy (safe for steal scripts)
+    AntiFallPlatform      = false,  
     DisableGameSounds     = true,  
     DisableParticles      = true,  
     DisableLightingEffects= true,  
-    Disable3DRendering    = true,  
+    Disable3DRendering    = false,  
     DisableCoreGui        = true,  
     AutoCleanRAM          = true,  
     CleanRAMInterval      = 10,    -- Changed from 15 to 10 for more aggressive GC
@@ -23,11 +24,11 @@ local CONFIG = {
     -- NEW FEATURES (v4 - Ultra RAM Reduction)
     DisableAnimations     = true,  -- Stop all character animations
     RemoveAccessories     = true,  -- Remove all character accessories (hats, clothes)
-    FreezeCamera          = true,  -- Freeze camera position
+    FreezeCamera          = false,  -- Freeze camera position
     DisableCollisions     = true,  -- Disable character collisions
     
     -- EXTRA FEATURES (v5 - Extreme RAM Reduction)
-    BodyTransparency      = true,  -- Make character invisible (transparency = 1)
+    BodyTransparency      = false,  -- Make character invisible (transparency = 1)
     DisableHealthDisplay  = true,  -- Hide health bar & name display
     DisableHumanoidStates = true,  -- Disable unused humanoid states (swimming, climbing, etc)
     RemoveAnimator        = true,  -- Remove animator object (more aggressive than DisableAnimations)
@@ -716,6 +717,53 @@ task.spawn(function()
                 task.wait(0.03)
             end
         end
+    end
+
+    -- NEW: Hide workspace objects instead of destroying (safe for steal scripts)
+    if CONFIG.HideExtreme then
+        print("🔄 HideExtreme: Starting to hide objects...")
+        local objectsHidden = 0
+        local children = Workspace:GetChildren()
+        
+        for i, child in ipairs(children) do
+            pcall(function()
+                if child ~= Character 
+                   and not Players:GetPlayerFromCharacter(child) 
+                   and child.Name ~= "Camera" 
+                   and child.Name ~= "Terrain" 
+                   and child.Name ~= "SafePlatform"
+                   and child.Name ~= "AreaEggSlotsClient"  -- Keep egg containers
+                   and not child.Name:lower():find("egg") then  -- Keep egg objects
+                   
+                    -- Method 1: Make invisible + no collision (safer)
+                    if child:IsA("Model") then
+                        for _, part in pairs(child:GetDescendants()) do
+                            if part:IsA("BasePart") then
+                                part.Transparency = 1
+                                part.CanCollide = false
+                                part.CastShadow = false
+                            elseif part:IsA("Decal") or part:IsA("Texture") then
+                                part.Transparency = 1
+                            end
+                        end
+                        objectsHidden = objectsHidden + 1
+                    elseif child:IsA("BasePart") then
+                        child.Transparency = 1
+                        child.CanCollide = false  
+                        child.CastShadow = false
+                        objectsHidden = objectsHidden + 1
+                    end
+                    
+                    -- Method 2: Remove from workspace (more aggressive)
+                    -- child.Parent = ReplicatedStorage  -- Move to storage instead of destroying
+                end
+            end)
+            
+            if i % 20 == 0 then
+                task.wait(0.03)
+            end
+        end
+        print("✅ HideExtreme: " .. objectsHidden .. " objects hidden (steal scripts safe)")
     end
 
     -- Clean descendants (particles, sounds, textures)
