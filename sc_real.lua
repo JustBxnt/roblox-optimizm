@@ -886,16 +886,3 @@ task.spawn(function()
         end)
     end
 end)
-
--- ========================================================
--- 9. AUTO SELL FRUITS (Every 10 minutes)
--- ========================================================
-task.spawn(function()
-    while task.wait(600) do  -- 600 seconds = 10 minutes
-        pcall(function()
-            print("🍎 Auto-Sell: Running sellFruits()...")
-            sellFruits()
-            print("✅ Auto-Sell: Complete!")
-        end)
-    end
-end)
