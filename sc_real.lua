@@ -10,8 +10,8 @@ task.wait(1)
 local CONFIG = {
     TargetFPS              = 60,     
     ShowBlackOverlay      = false,  
-    ExtremeDestroy        = true,  -- Destroy objects completely (dangerous for steal scripts)
-    HideExtreme           = false,   -- NEW: Hide objects instead of destroy (safe for steal scripts)
+    ExtremeDestroy        = false,  -- Destroy objects completely (dangerous for steal scripts)
+    HideExtreme           = true,   -- NEW: Hide objects instead of destroy (safe for steal scripts)
     AntiFallPlatform      = true,  
     DisableGameSounds     = true,  
     DisableParticles      = true,  
